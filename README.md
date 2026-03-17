@@ -136,31 +136,3 @@ npx http-server . -p 5173
 2. Включите `Authentication` (Email/Password).
 3. Создайте базу `Firestore`.
 4. Проверьте `window.EASYRENT_CONFIG` в HTML-страницах.
-5. Задеплойте правила и индексы:
-
-```powershell
-firebase deploy --only firestore --project easyrent-369d9
-```
-
-Или отдельно:
-
-```powershell
-firebase deploy --only firestore:rules --project easyrent-369d9
-firebase deploy --only firestore:indexes --project easyrent-369d9
-```
-
-## Демо-данные
-
-В проекте есть инструменты для наполнения и синхронизации данных:
-
-- `seedTestData()` в админ-панели;
-- `scripts/reset-demo.js` — пересоздаёт демо-данные;
-- `scripts/sync-listing-cards.js` — синхронизирует `listing_cards` с `listings`.
-
-Пример запуска через сервисный аккаунт:
-
-```powershell
-$env:GOOGLE_APPLICATION_CREDENTIALS="C:\path\to\service-account.json"
-node scripts/reset-demo.js
-node scripts/sync-listing-cards.js
-```
