@@ -1,0 +1,156 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return signedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    function isOwner(resourceData) {
+      return signedIn() && resourceData.ownerId == request.auth.uid;
+    }
+
+    function viewsOnly() {
+      return request.resource.data.diff(resource.data).changedKeys().hasOnly(["views"]);
+    }
+
+    function ratingOnly() {
+      return request.resource.data.diff(resource.data).changedKeys().hasOnly(["rating", "ratingCount", "ratingSum", "updatedAt"]);
+    }
+
+    function cardViewsOnly() {
+      return request.resource.data.diff(resource.data).changedKeys().hasOnly(["views", "updatedAt"]);
+    }
+
+    function cardRatingOnly() {
+      return request.resource.data.diff(resource.data).changedKeys().hasOnly(["rating", "ratingCount", "ratingSum", "updatedAt"]);
+    }
+
+    function messageImmutableFieldsUnchanged() {
+      return request.resource.data.listingId == resource.data.listingId
+        && request.resource.data.senderId == resource.data.senderId
+        && request.resource.data.receiverId == resource.data.receiverId
+        && request.resource.data.participants == resource.data.participants
+        && request.resource.data.createdAt == resource.data.createdAt;
+    }
+
+    function senderMessageUpdate() {
+      return signedIn()
+        && resource.data.senderId == request.auth.uid
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly(["text", "updatedAt"])
+        && messageImmutableFieldsUnchanged();
+    }
+
+    function receiverMessageUpdate() {
+      return signedIn()
+        && resource.data.receiverId == request.auth.uid
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly(["read", "updatedAt"])
+        && messageImmutableFieldsUnchanged();
+    }
+
+    function bookingUserMutableOnly() {
+      return request.resource.data.diff(resource.data).changedKeys().hasOnly(["status", "dateFrom", "dateTo", "updatedAt"])
+        && request.resource.data.userId == resource.data.userId
+        && request.resource.data.ownerId == resource.data.ownerId
+        && request.resource.data.listingId == resource.data.listingId
+        && request.resource.data.createdAt == resource.data.createdAt;
+    }
+
+    match /users/{userId} {
+      allow read: if isAdmin() || (signedIn() && request.auth.uid == userId);
+      allow create: if isAdmin() || (signedIn() && request.auth.uid == userId && request.resource.data.role == 'user');
+      allow update: if isAdmin() || (signedIn() && request.auth.uid == userId && request.resource.data.role == resource.data.role);
+      allow delete: if isAdmin();
+    }
+
+    match /listings/{listingId} {
+      allow read: if true;
+      allow create: if isAdmin();
+      allow update: if isAdmin() || isOwner(resource.data) || (signedIn() && viewsOnly()) || (signedIn() && ratingOnly());
+      allow delete: if isAdmin() || isOwner(resource.data);
+
+      match /images/{imageId} {
+        allow read: if true;
+        allow create, update, delete: if isAdmin() || isOwner(get(/databases/$(database)/documents/listings/$(listingId)).data);
+      }
+
+      match /reviews/{reviewId} {
+        allow read: if true;
+        allow create: if signedIn() && request.resource.data.userId == request.auth.uid;
+        allow update, delete: if isAdmin() || (signedIn() && resource.data.userId == request.auth.uid);
+      }
+    }
+
+    match /listing_cards/{listingId} {
+      allow read: if true;
+      allow create: if isAdmin();
+      allow update: if isAdmin() || isOwner(resource.data) || (signedIn() && cardViewsOnly()) || (signedIn() && cardRatingOnly());
+      allow delete: if isAdmin() || isOwner(resource.data);
+    }
+
+    match /amenities/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /regions/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /districts/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /property_types/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /favorites/{favoriteId} {
+      allow read: if signedIn() && resource.data.userId == request.auth.uid;
+      allow create: if signedIn() && request.resource.data.userId == request.auth.uid;
+      allow delete: if signedIn() && resource.data.userId == request.auth.uid;
+      allow update: if false;
+    }
+
+    match /messages/{messageId} {
+      allow read: if signedIn() && (resource.data.senderId == request.auth.uid || resource.data.receiverId == request.auth.uid || isAdmin());
+      allow create: if signedIn()
+        && request.resource.data.senderId == request.auth.uid
+        && request.resource.data.participants.size() == 2
+        && request.resource.data.participants.hasAll([request.resource.data.senderId, request.resource.data.receiverId]);
+      allow update: if isAdmin() || senderMessageUpdate() || receiverMessageUpdate();
+      allow delete: if isAdmin() || (signedIn() && resource.data.senderId == request.auth.uid);
+    }
+
+    match /bookings/{bookingId} {
+      allow read: if isAdmin() || (signedIn() && (resource.data.userId == request.auth.uid || resource.data.ownerId == request.auth.uid));
+      allow create: if signedIn() && request.resource.data.userId == request.auth.uid;
+      allow update: if isAdmin() || (signedIn() && resource.data.userId == request.auth.uid && bookingUserMutableOnly());
+      allow delete: if isAdmin() || (signedIn() && resource.data.userId == request.auth.uid);
+    }
+
+    match /availability/{slotId} {
+      allow read: if true;
+      allow create, update: if isAdmin() || (signedIn() && request.resource.data.userId == request.auth.uid);
+      allow delete: if isAdmin() || (signedIn() && resource.data.userId == request.auth.uid);
+    }
+
+    match /active_actions/{actionId} {
+      allow read: if isAdmin() || (signedIn() && resource.data.userId == request.auth.uid);
+      allow create, update: if isAdmin() || (signedIn() && request.resource.data.userId == request.auth.uid);
+      allow delete: if isAdmin() || (signedIn() && resource.data.userId == request.auth.uid);
+    }
+
+    match /action_history/{actionId} {
+      allow read: if isAdmin() || (signedIn() && resource.data.userId == request.auth.uid);
+      allow create, update: if isAdmin() || (signedIn() && request.resource.data.userId == request.auth.uid);
+      allow delete: if isAdmin() || (signedIn() && resource.data.userId == request.auth.uid);
+    }
+  }
+}

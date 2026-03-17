@@ -1,0 +1,137 @@
+﻿<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EasyRent | Объявление</title>
+  <link rel="stylesheet" href="css/style.css" />
+    <script>
+    window.EASYRENT_CONFIG = {
+      apiKey: "AIzaSyBmtkx3eRyJy5zQE2FFzmrFwJxUrvIQeJs",
+      authDomain: "easyrent-369d9.firebaseapp.com",
+      projectId: "easyrent-369d9",
+      storageBucket: "easyrent-369d9.firebasestorage.app",
+      messagingSenderId: "26566690546",
+      appId: "1:26566690546:web:8e34fd6ce342a38516726b",
+      measurementId: "G-3YNK7RTWQ2"
+    };
+  </script>
+</head>
+<body data-page="listing">
+  <header class="topbar">
+    <div class="brand">EasyRent</div>
+    <nav class="nav">
+      <a href="index.html">Главная</a>
+      <a href="profile.html">Профиль</a>
+      <a href="cart.html">Бронирования</a>
+      <a id="admin-link" href="admin.html" class="hidden">Админ</a>
+    </nav>
+    <div class="auth">
+      <button id="open-auth" class="btn btn-outline">Войти</button>
+      <div id="user-menu" class="hidden">
+        <span id="user-email" class="muted"></span>
+        <button id="logout-btn" class="btn btn-outline">Выйти</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section id="listing-detail" class="panel"></section>
+    <section class="panel">
+      <h2>Галерея</h2>
+      <div id="listing-gallery" class="gallery"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Доступность</h2>
+      <div id="availability-list" class="stack"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Похожие предложения</h2>
+      <div id="related-listings" class="grid"></div>
+      <p id="related-error" class="muted hidden"></p>
+      <div class="center">
+        <button id="related-load-more" class="btn btn-outline">Показать ещё</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Отзывы</h2>
+      <div id="reviews-list" class="stack"></div>
+      <form id="review-form" class="form stack">
+        <input class="input" name="rating" type="number" min="1" max="5" placeholder="Оценка (1-5)" required />
+        <textarea class="input" name="text" rows="4" placeholder="Поделитесь впечатлениями"></textarea>
+        <button class="btn btn-primary" type="submit">Отправить отзыв</button>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2>Сообщение владельцу</h2>
+      <div id="messages-list" class="stack"></div>
+      <form id="message-form" class="form stack">
+        <textarea class="input" name="text" rows="3" placeholder="Напишите сообщение" required></textarea>
+        <button class="btn btn-primary" type="submit">Отправить сообщение</button>
+      </form>
+    </section>
+  </main>
+
+  <div id="auth-modal" class="modal hidden">
+    <div class="modal-content">
+      <button id="close-auth" class="close-btn">x</button>
+      <div class="tabs">
+        <button data-tab="login" class="tab active">Вход</button>
+        <button data-tab="register" class="tab">Регистрация</button>
+        <button data-tab="reset" class="tab">Восстановление</button>
+      </div>
+      <form id="login-form" class="form stack" data-panel="login">
+        <input class="input" name="email" type="email" placeholder="Эл. почта" required />
+        <input class="input" name="password" type="password" placeholder="Пароль" required />
+        <button class="btn btn-primary" type="submit">Войти</button>
+      </form>
+      <form id="register-form" class="form stack hidden" data-panel="register">
+        <input class="input" name="name" type="text" placeholder="Полное имя" required />
+        <input class="input" name="email" type="email" placeholder="Эл. почта" required />
+        <input class="input" name="phone" type="tel" placeholder="Телефон" />
+        <input class="input" name="password" type="password" placeholder="Пароль" required />
+        <button class="btn btn-primary" type="submit">Создать аккаунт</button>
+      </form>
+      <form id="reset-form" class="form stack hidden" data-panel="reset">
+        <input class="input" name="email" type="email" placeholder="Эл. почта" required />
+        <button class="btn btn-primary" type="submit">Отправить ссылку</button>
+      </form>
+      <p id="auth-message" class="muted"></p>
+    </div>
+  </div>
+
+  <div id="booking-modal" class="modal hidden">
+    <div class="modal-content booking-modal-content">
+      <button id="close-booking-modal" class="close-btn">x</button>
+      <h3>Оформление бронирования</h3>
+      <p id="booking-modal-subtitle" class="muted">Выберите даты поездки</p>
+      <form id="booking-form" class="form stack">
+        <label>
+          Дата заезда
+          <input class="input" name="dateFrom" type="date" required />
+        </label>
+        <label>
+          Дата выезда
+          <input class="input" name="dateTo" type="date" required />
+        </label>
+        <p id="booking-form-message" class="muted"></p>
+        <div class="form-actions">
+          <button class="btn btn-primary" type="submit">Подтвердить бронирование</button>
+          <button id="cancel-booking-btn" class="btn btn-outline" type="button">Отмена</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer class="footer">EasyRent — демо на Firebase</footer>
+  <script type="module" src="js/pages/listing.js"></script>
+</body>
+</html>
+
+
+
+

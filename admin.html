@@ -1,0 +1,146 @@
+﻿<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EasyRent | Админ</title>
+  <link rel="stylesheet" href="css/style.css" />
+    <script>
+    window.EASYRENT_CONFIG = {
+      apiKey: "AIzaSyBmtkx3eRyJy5zQE2FFzmrFwJxUrvIQeJs",
+      authDomain: "easyrent-369d9.firebaseapp.com",
+      projectId: "easyrent-369d9",
+      storageBucket: "easyrent-369d9.firebasestorage.app",
+      messagingSenderId: "26566690546",
+      appId: "1:26566690546:web:8e34fd6ce342a38516726b",
+      measurementId: "G-3YNK7RTWQ2"
+    };
+  </script>
+</head>
+<body data-page="admin">
+  <header class="topbar">
+    <div class="brand">EasyRent</div>
+    <nav class="nav">
+      <a href="index.html">Главная</a>
+      <a href="profile.html">Профиль</a>
+      <a href="cart.html">Бронирования</a>
+      <a id="admin-link" href="admin.html" class="hidden">Админ</a>
+    </nav>
+    <div class="auth">
+      <button id="open-auth" class="btn btn-outline">Войти</button>
+      <div id="user-menu" class="hidden">
+        <span id="user-email" class="muted"></span>
+        <button id="logout-btn" class="btn btn-outline">Выйти</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section id="admin-guard" class="panel"></section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <h2>Панель</h2>
+        <div class="panel-actions">
+          <button id="seed-data-btn" class="btn btn-outline">Пересоздать демо-данные</button>
+          <button id="localize-status-btn" class="btn btn-outline">Локализовать статусы</button>
+        </div>
+      </div>
+      <div id="admin-stats" class="stats"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Управление объявлениями</h2>
+      <form id="listing-form" class="form grid-form">
+        <input class="input" name="title" type="text" placeholder="Заголовок" required />
+        <input class="input" name="price" type="number" min="0" placeholder="Цена" required />
+        <input class="input" name="propertyType" type="text" placeholder="Тип жилья" required />
+        <input class="input" name="region" type="text" placeholder="Регион" required />
+        <input class="input" name="district" type="text" placeholder="Район" required />
+        <input class="input" name="address" type="text" placeholder="Адрес" required />
+        <input class="input" name="rooms" type="number" min="0" placeholder="Комнаты" required />
+        <input class="input" name="area" type="number" min="0" placeholder="Площадь (м²)" required />
+        <input class="input" name="amenities" type="text" placeholder="Удобства (через запятую)" />
+        <input class="input" name="imageUrls" type="text" placeholder="Ссылки на изображения (через запятую)" />
+        <select class="select" name="status">
+          <option value="активно">Активно</option>
+          <option value="черновик">Черновик</option>
+          <option value="архив">Архив</option>
+        </select>
+        <textarea class="input" name="description" rows="3" placeholder="Описание"></textarea>
+        <div class="form-actions">
+          <button class="btn btn-primary" type="submit">Сохранить объявление</button>
+          <button id="cancel-edit" class="btn btn-outline" type="button">Отменить</button>
+        </div>
+      </form>
+      <div id="admin-listings" class="stack"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Пользователи</h2>
+      <form id="user-form" class="form grid-form">
+        <input class="input" name="name" type="text" placeholder="Имя" required />
+        <input class="input" name="email" type="email" placeholder="Эл. почта" required />
+        <input class="input" name="phone" type="tel" placeholder="Телефон" />
+        <select class="select" name="role">
+          <option value="user">Пользователь</option>
+          <option value="admin">Администратор</option>
+        </select>
+        <div class="form-actions">
+          <button class="btn btn-primary" type="submit">Сохранить пользователя</button>
+          <button id="cancel-user-edit" class="btn btn-outline" type="button">Отменить</button>
+        </div>
+      </form>
+      <div id="admin-users" class="stack"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Бронирования</h2>
+      <div id="admin-bookings" class="stack"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Модерация</h2>
+      <h3>Сообщения</h3>
+      <div id="moderation-messages" class="stack"></div>
+      <h3>Отзывы</h3>
+      <div id="moderation-reviews" class="stack"></div>
+    </section>
+  </main>
+
+  <div id="auth-modal" class="modal hidden">
+    <div class="modal-content">
+      <button id="close-auth" class="close-btn">x</button>
+      <div class="tabs">
+        <button data-tab="login" class="tab active">Вход</button>
+        <button data-tab="register" class="tab">Регистрация</button>
+        <button data-tab="reset" class="tab">Восстановление</button>
+      </div>
+      <form id="login-form" class="form stack" data-panel="login">
+        <input class="input" name="email" type="email" placeholder="Эл. почта" required />
+        <input class="input" name="password" type="password" placeholder="Пароль" required />
+        <button class="btn btn-primary" type="submit">Войти</button>
+      </form>
+      <form id="register-form" class="form stack hidden" data-panel="register">
+        <input class="input" name="name" type="text" placeholder="Полное имя" required />
+        <input class="input" name="email" type="email" placeholder="Эл. почта" required />
+        <input class="input" name="phone" type="tel" placeholder="Телефон" />
+        <input class="input" name="password" type="password" placeholder="Пароль" required />
+        <button class="btn btn-primary" type="submit">Создать аккаунт</button>
+      </form>
+      <form id="reset-form" class="form stack hidden" data-panel="reset">
+        <input class="input" name="email" type="email" placeholder="Эл. почта" required />
+        <button class="btn btn-primary" type="submit">Отправить ссылку</button>
+      </form>
+      <p id="auth-message" class="muted"></p>
+    </div>
+  </div>
+
+  <footer class="footer">Панель администратора EasyRent</footer>
+  <script type="module" src="js/pages/admin.js"></script>
+</body>
+</html>
+
+
+
+

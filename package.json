@@ -1,0 +1,19 @@
+{
+  "name": "easyrent",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "firebase": "^12.10.0",
+    "firebase-admin": "^13.7.0"
+  },
+  "description": "",
+  "devDependencies": {
+    "playwright": "^1.58.2"
+  }
+}

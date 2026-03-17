@@ -1,0 +1,177 @@
+﻿<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EasyRent | Главная</title>
+  <link rel="stylesheet" href="css/style.css" />
+    <script>
+    window.EASYRENT_CONFIG = {
+      apiKey: "AIzaSyBmtkx3eRyJy5zQE2FFzmrFwJxUrvIQeJs",
+      authDomain: "easyrent-369d9.firebaseapp.com",
+      projectId: "easyrent-369d9",
+      storageBucket: "easyrent-369d9.firebasestorage.app",
+      messagingSenderId: "26566690546",
+      appId: "1:26566690546:web:8e34fd6ce342a38516726b",
+      measurementId: "G-3YNK7RTWQ2"
+    };
+  </script>
+</head>
+<body data-page="index">
+  <header class="topbar">
+    <div class="brand">EasyRent</div>
+    <nav class="nav">
+      <a href="index.html">Главная</a>
+      <a href="profile.html">Профиль</a>
+      <a href="cart.html">Бронирования</a>
+      <a id="admin-link" href="admin.html" class="hidden">Админ</a>
+    </nav>
+    <div class="auth">
+      <button id="open-auth" class="btn btn-outline">Войти</button>
+      <div id="user-menu" class="hidden">
+        <span id="user-email" class="muted"></span>
+        <button id="logout-btn" class="btn btn-outline">Выйти</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div>
+        <h1>Найдите жильё, которое ощущается как дом</h1>
+        <p class="muted">Объявления в реальном времени, проверенные хозяева и быстрое бронирование.</p>
+      </div>
+      <div class="hero-card">
+        <div class="stat">
+          <span class="stat-value" id="listing-count">0</span>
+          <span class="stat-label">активных объявлений</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value" id="realtime-indicator">Онлайн</span>
+          <span class="stat-label">обновления</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <form id="search-form" class="search-bar">
+        <input id="search-input" class="input" type="search" placeholder="Поиск по названию или описанию" />
+        <button class="btn btn-primary" type="submit">Поиск</button>
+      </form>
+
+      <div class="filters" id="filter-form">
+        <div class="filter hidden" id="filter-status-wrap">
+          <label>Статус</label>
+          <select id="filter-status" class="select">
+            <option value="активно">Активно</option>
+            <option value="черновик">Черновик</option>
+            <option value="архив">Архив</option>
+            <option value="">Все</option>
+          </select>
+        </div>
+        <div class="filter">
+          <label>Тип жилья</label>
+          <select id="filter-type" class="select"></select>
+        </div>
+        <div class="filter">
+          <label>Регион</label>
+          <select id="filter-region" class="select"></select>
+        </div>
+        <div class="filter">
+          <label>Район</label>
+          <select id="filter-district" class="select"></select>
+        </div>
+        <div class="filter">
+          <label>Удобство</label>
+          <select id="filter-amenity" class="select"></select>
+        </div>
+        <div class="filter">
+          <label>Цена от</label>
+          <input id="filter-price-min" class="input" type="number" min="0" placeholder="0" />
+        </div>
+        <div class="filter">
+          <label>Цена до</label>
+          <input id="filter-price-max" class="input" type="number" min="0" placeholder="500" />
+        </div>
+        <div class="filter">
+          <label>Комнат от</label>
+          <input id="filter-rooms-min" class="input" type="number" min="0" placeholder="0" />
+        </div>
+        <div class="filter">
+          <label>Комнат до</label>
+          <input id="filter-rooms-max" class="input" type="number" min="0" placeholder="6" />
+        </div>
+        <div class="filter">
+          <label>Площадь от (м²)</label>
+          <input id="filter-area-min" class="input" type="number" min="0" placeholder="20" />
+        </div>
+        <div class="filter">
+          <label>Площадь до (м²)</label>
+          <input id="filter-area-max" class="input" type="number" min="0" placeholder="200" />
+        </div>
+        <div class="filter">
+          <label>Рейтинг от</label>
+          <select id="filter-rating-min" class="select">
+            <option value="">Любой</option>
+            <option value="3">3+</option>
+            <option value="3.5">3.5+</option>
+            <option value="4">4+</option>
+            <option value="4.5">4.5+</option>
+          </select>
+        </div>
+        <div class="filter">
+          <label>Сортировка</label>
+          <select id="sort-by" class="select">
+            <option value="createdAt:desc">Сначала новые</option>
+            <option value="price:asc">Цена: по возрастанию</option>
+            <option value="price:desc">Цена: по убыванию</option>
+            <option value="rating:desc">Рейтинг</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid" id="listings-grid"></section>
+    <p id="listings-error" class="muted hidden"></p>
+
+    <div class="center">
+      <button id="load-more" class="btn btn-outline">Показать ещё</button>
+    </div>
+  </main>
+
+  <div id="auth-modal" class="modal hidden">
+    <div class="modal-content">
+      <button id="close-auth" class="close-btn">x</button>
+      <div class="tabs">
+        <button data-tab="login" class="tab active">Вход</button>
+        <button data-tab="register" class="tab">Регистрация</button>
+        <button data-tab="reset" class="tab">Восстановление</button>
+      </div>
+      <form id="login-form" class="form stack" data-panel="login">
+        <input class="input" name="email" type="email" placeholder="Эл. почта" required />
+        <input class="input" name="password" type="password" placeholder="Пароль" required />
+        <button class="btn btn-primary" type="submit">Войти</button>
+      </form>
+      <form id="register-form" class="form stack hidden" data-panel="register">
+        <input class="input" name="name" type="text" placeholder="Полное имя" required />
+        <input class="input" name="email" type="email" placeholder="Эл. почта" required />
+        <input class="input" name="phone" type="tel" placeholder="Телефон" />
+        <input class="input" name="password" type="password" placeholder="Пароль" required />
+        <button class="btn btn-primary" type="submit">Создать аккаунт</button>
+      </form>
+      <form id="reset-form" class="form stack hidden" data-panel="reset">
+        <input class="input" name="email" type="email" placeholder="Эл. почта" required />
+        <button class="btn btn-primary" type="submit">Отправить ссылку</button>
+      </form>
+      <p id="auth-message" class="muted"></p>
+    </div>
+  </div>
+
+  <footer class="footer">EasyRent — демо на Firebase</footer>
+  <script type="module" src="js/pages/index.js"></script>
+</body>
+</html>
+
+
+
+
