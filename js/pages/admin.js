@@ -12,7 +12,6 @@ import {
 } from "../services/adminService.js";
 import { updateBookingStatus, removeBooking } from "../services/bookingsService.js";
 import { deleteMessage } from "../services/messagesService.js";
-import { seedTestData, resetDemoData, localizeStatuses } from "../core/firebase.js";
 import {
   renderAdminListingCard,
   renderAdminBookingCard,
@@ -35,8 +34,6 @@ const usersEl = qs("#admin-users");
 const bookingsEl = qs("#admin-bookings");
 const moderationMessagesEl = qs("#moderation-messages");
 const moderationReviewsEl = qs("#moderation-reviews");
-const seedBtn = qs("#seed-data-btn");
-const localizeStatusBtn = qs("#localize-status-btn");
 const cancelEditBtn = qs("#cancel-edit");
 const cancelUserEditBtn = qs("#cancel-user-edit");
 
@@ -304,40 +301,6 @@ if (moderationReviewsEl) {
         reviewId: card.dataset.reviewId
       });
       await loadModeration();
-    }
-  });
-}
-
-if (seedBtn) {
-  on(seedBtn, "click", async () => {
-    if (!ensureAdminAction()) return;
-    try {
-      const proceed = window.confirm(
-        "Пересоздать демо-данные? Мы удалим только демо-записи и создадим новые."
-      );
-      if (!proceed) return;
-      await resetDemoData();
-      await seedTestData(window.EASYRENT?.auth?.user);
-      await localizeStatuses();
-      await Promise.all([loadStats(), loadListings(), loadUsers(), loadBookings(), loadModeration()]);
-      if (guard) guard.textContent = "Демо-данные пересозданы.";
-    } catch (error) {
-      if (guard) guard.textContent = translateFirebaseError(error, "Не удалось загрузить демо-данные.");
-    }
-  });
-}
-
-if (localizeStatusBtn) {
-  on(localizeStatusBtn, "click", async () => {
-    if (!ensureAdminAction()) return;
-    try {
-      const result = await localizeStatuses();
-      if (guard) {
-        guard.textContent = `Статусы локализованы. Объявления: ${result.listings}, бронирования: ${result.bookings}.`;
-      }
-      await Promise.all([loadListings(), loadUsers(), loadBookings()]);
-    } catch (error) {
-      if (guard) guard.textContent = translateFirebaseError(error, "Не удалось локализовать статусы.");
     }
   });
 }
